@@ -171,7 +171,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     </div>
   </div>
   <div class="form-card">
-    <label class="form-label">Gruppen (je 10 Kredite)</label>
+    <label class="form-label">Gruppen (je 10 Münzen)</label>
     <div id="groupConfigs"></div>
   </div>
   <button class="btn-primary" id="createSessionBtn" onclick="createSession()">Sitzung erstellen</button>
@@ -246,7 +246,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     </div>
     <div class="credits-row">
       <div class="credits-track"><div class="credits-fill" id="creditsFill" style="width:100%"></div></div>
-      <div class="credits-label" id="creditsLabel">10 Kredite verf&#252;gbar</div>
+      <div class="credits-label" id="creditsLabel">10 M&#252;nzen verf&#252;gbar</div>
     </div>
   </div>
   <div class="locations-scroll" id="locationsList"></div>
@@ -348,7 +348,7 @@ function changeGroupCount(delta) {
 function renderGroupConfigs() {
   document.getElementById('groupConfigs').innerHTML =
     Array.from({length: groupCount}, (_, i) =>
-      '<div class="group-config"><span class="group-config-name">Gruppe ' + (i+1) + ' \u2014 10 Kredite</span></div>'
+      '<div class="group-config"><span class="group-config-name">Gruppe ' + (i+1) + ' \u2014 10 M\u00fcnzen</span></div>'
     ).join('');
 }
 
@@ -419,7 +419,7 @@ function updateCredits() {
   const used = getUsedCredits(), rem = MAX_CREDITS - used;
   const pct  = Math.max(0, rem / MAX_CREDITS * 100);
   document.getElementById('creditsValue').textContent = rem;
-  document.getElementById('creditsLabel').textContent = rem + ' Kredite verf\u00fcgbar';
+  document.getElementById('creditsLabel').textContent = rem + ' M\u00fcnzen verf\u00fcgbar';
   const pill = document.getElementById('creditsPill');
   const fill = document.getElementById('creditsFill');
   pill.className = 'credits-pill' + (rem <= 0 ? ' empty' : rem <= 3 ? ' low' : '');
