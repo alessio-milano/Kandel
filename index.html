@@ -190,6 +190,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <label class="form-label">Gruppen</label>
     <div id="adminGroupList"></div>
   </div>
+  <div class="form-card" id="dashLinkCard" style="display:none">
+    <label class="form-label">&#128279; Link zur Dashboard (f&#252;r PowerPoint)</label>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input class="form-input" id="dashLinkInput" readonly style="font-size:13px;color:#555;background:#f8f8f8;cursor:default">
+      <button onclick="copyDashLink()" style="flex-shrink:0;padding:14px 16px;background:var(--accent2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer" id="copyBtn">Kopieren</button>
+    </div>
+  </div>
   <button class="btn-primary" onclick="openDashboard(currentSessionId)">Zum Dashboard</button>
   <button class="btn-secondary" onclick="showView('home')">&#8592; Zur Startseite</button>
 </div>
@@ -312,6 +319,14 @@ function showView(id) {
   if (id === 'admin-setup')    renderGroupConfigs();
   if (id === 'group-join')     loadSessions('sessionSelectGroup');
   if (id === 'dashboard-join') loadSessions('sessionSelectDash');
+  if (id === 'home')           window.location.hash = '';
+}
+
+function parseHash() {
+  const hash = window.location.hash.replace('#', '');
+  if (!hash) return;
+  const [type, id] = hash.split('/');
+  if (type === 'dashboard' && id) openDashboard(id);
 }
 
 function toast(msg) {
@@ -361,6 +376,9 @@ async function createSession() {
     document.getElementById('adminGroupList').innerHTML = grps.map((g,i) =>
       '<div class="group-list-item"><div class="group-num">' + (i+1) + '</div><div class="group-list-name">' + g.name + '</div></div>'
     ).join('');
+    const dashUrl = location.origin + location.pathname + '#dashboard/' + sess.id;
+    document.getElementById('dashLinkInput').value = dashUrl;
+    document.getElementById('dashLinkCard').style.display = 'block';
     showView('admin-join');
   } catch(err) { toast('Fehler: ' + err.message); }
   finally { btn.disabled = false; btn.textContent = 'Sitzung erstellen'; }
@@ -456,6 +474,7 @@ async function joinDashboard() {
 }
 async function openDashboard(sessionId) {
   currentSessionId = sessionId;
+  window.location.hash = 'dashboard/' + sessionId;
   const { data: sess } = await sb.from('sessions').select('*').eq('id', sessionId).single();
   const { data: grps } = await sb.from('groups').select('*').eq('session_id', sessionId);
   const groupIds = (grps||[]).map(g => g.id);
@@ -493,8 +512,21 @@ async function loadDashboardData(groupIds) {
   ).join('');
 }
 
-showView('home');
-renderGroupConfigs();
+function copyDashLink() {
+  const input = document.getElementById('dashLinkInput');
+  navigator.clipboard.writeText(input.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Kopiert!';
+    setTimeout(() => btn.textContent = 'Kopieren', 2000);
+  }).catch(() => {
+    input.select();
+    document.execCommand('copy');
+    toast('Link kopiert!');
+  });
+}
+
+parseHash();
+if (!window.location.hash) { showView('home'); renderGroupConfigs(); }
 </script>
 </body>
 </html>
