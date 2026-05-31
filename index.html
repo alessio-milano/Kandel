@@ -128,18 +128,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .rank-empty { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 14px; }
 .dash-back-col { margin: 12px; flex-shrink: 0; }
 
-/* INSTRUCTION CARD */
-.info-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; border-left: 4px solid var(--accent2); }
-.info-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.info-card-header-left { display: flex; align-items: center; gap: 8px; }
-.info-card-title { font-size: 15px; font-weight: 700; color: var(--accent2); }
-.info-card-arrow { font-size: 20px; color: var(--muted); transition: transform 0.25s; line-height: 1; }
-.info-card.open .info-card-arrow { transform: rotate(180deg); }
-.info-card-body { display: none; padding: 0 16px 16px; border-top: 1px solid #f0f0f0; }
-.info-card.open .info-card-body { display: block; }
-.info-card-text { font-size: 14px; color: var(--text); line-height: 1.65; margin-top: 12px; }
-.info-card-text p { margin-bottom: 6px; }
-.info-card-cta { font-size: 14px; font-weight: 600; color: var(--accent2); margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+/* INSTRUCTION OVERLAY */
+.intro-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.intro-overlay.hidden { display: none; }
+.intro-box { background: var(--card); border-radius: 24px; padding: 32px 28px 28px; max-width: 480px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,0.28); }
+.intro-icon { font-size: 40px; text-align: center; margin-bottom: 12px; }
+.intro-title { font-size: 20px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 20px; }
+.intro-rules { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+.intro-rules li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: var(--text); line-height: 1.5; }
+.intro-rules li span.bullet { font-size: 20px; flex-shrink: 0; line-height: 1.3; }
+.intro-cta { font-size: 15px; font-weight: 600; color: var(--accent2); text-align: center; margin-bottom: 24px; padding: 14px 16px; background: #ede8f7; border-radius: 12px; line-height: 1.45; }
+.intro-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: var(--radius); font-size: 18px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; }
 
 /* TOAST */
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #333; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 2000; pointer-events: none; }
@@ -262,24 +261,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
       <div class="credits-label" id="creditsLabel">10 M&#252;nzen verf&#252;gbar</div>
     </div>
   </div>
-  <div class="locations-scroll" id="locationsList">
-    <div class="info-card open" id="infoCard">
-      <div class="info-card-header" onclick="toggleInfo()">
-        <div class="info-card-header-left">
-          <span style="font-size:20px">&#9432;</span>
-          <span class="info-card-title">Verbesserungsvorschl&auml;ge f&uuml;r Kandel</span>
-        </div>
-        <span class="info-card-arrow">&#8964;</span>
-      </div>
-      <div class="info-card-body">
-        <div class="info-card-text">
-          <p>W&auml;hlt Vorschl&auml;ge aus, die eurem Kind besonders helfen.</p>
-          <p>Achtet auf eure Ampelbewertung, den Ort und die Kinderrechte.</p>
-          <p>Ihr k&ouml;nnt h&ouml;chstens 10 M&uuml;nzen &#129529; ausgeben.</p>
-        </div>
-        <div class="info-card-cta">Entscheidet gemeinsam: Welche Ma&szlig;nahmen sind f&uuml;r euer Kind am wichtigsten?</div>
-      </div>
+  <div class="intro-overlay hidden" id="introOverlay">
+    <div class="intro-box">
+      <div class="intro-icon">&#129529;</div>
+      <div class="intro-title">Verbesserungsvorschl&auml;ge f&uuml;r Kandel</div>
+      <ul class="intro-rules">
+        <li><span class="bullet">&#128072;</span> W&auml;hlt Vorschl&auml;ge aus, die eurem Kind besonders helfen.</li>
+        <li><span class="bullet">&#128994;</span> Achtet auf eure Ampelbewertung, den Ort und die Kinderrechte.</li>
+        <li><span class="bullet">&#129529;</span> Ihr k&ouml;nnt h&ouml;chstens <strong>10 M&uuml;nzen</strong> ausgeben.</li>
+      </ul>
+      <div class="intro-cta">Entscheidet gemeinsam:<br>Welche Ma&szlig;nahmen sind f&uuml;r euer Kind am wichtigsten?</div>
+      <button class="intro-btn" onclick="closeIntro()">Los geht&#8217;s! &#8594;</button>
     </div>
+  </div>
+  <div class="locations-scroll" id="locationsList">
     <div id="interventionItems"></div>
   </div>
 </div>
@@ -435,6 +430,7 @@ async function joinGroup() {
 
 function initGroupView() {
   document.getElementById('groupNameLabel').textContent = currentGroupName;
+  document.getElementById('introOverlay').classList.remove('hidden');
   updateCredits(); renderInterventionList();
 }
 
@@ -537,8 +533,8 @@ async function loadDashboardData(groupIds) {
   ).join('');
 }
 
-function toggleInfo() {
-  document.getElementById('infoCard').classList.toggle('open');
+function closeIntro() {
+  document.getElementById('introOverlay').classList.add('hidden');
 }
 
 function sizeDashMap() {
