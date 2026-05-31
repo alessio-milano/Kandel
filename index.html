@@ -128,6 +128,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .rank-empty { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 14px; }
 .dash-back-col { margin: 12px; flex-shrink: 0; }
 
+/* INSTRUCTION CARD */
+.info-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; border-left: 4px solid var(--accent2); }
+.info-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.info-card-header-left { display: flex; align-items: center; gap: 8px; }
+.info-card-title { font-size: 15px; font-weight: 700; color: var(--accent2); }
+.info-card-arrow { font-size: 20px; color: var(--muted); transition: transform 0.25s; line-height: 1; }
+.info-card.open .info-card-arrow { transform: rotate(180deg); }
+.info-card-body { display: none; padding: 0 16px 16px; border-top: 1px solid #f0f0f0; }
+.info-card.open .info-card-body { display: block; }
+.info-card-text { font-size: 14px; color: var(--text); line-height: 1.65; margin-top: 12px; }
+.info-card-text p { margin-bottom: 6px; }
+.info-card-cta { font-size: 14px; font-weight: 600; color: var(--accent2); margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+
 /* TOAST */
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #333; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 2000; pointer-events: none; }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -249,7 +262,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
       <div class="credits-label" id="creditsLabel">10 M&#252;nzen verf&#252;gbar</div>
     </div>
   </div>
-  <div class="locations-scroll" id="locationsList"></div>
+  <div class="locations-scroll" id="locationsList">
+    <div class="info-card open" id="infoCard">
+      <div class="info-card-header" onclick="toggleInfo()">
+        <div class="info-card-header-left">
+          <span style="font-size:20px">&#9432;</span>
+          <span class="info-card-title">Verbesserungsvorschl&auml;ge f&uuml;r Kandel</span>
+        </div>
+        <span class="info-card-arrow">&#8964;</span>
+      </div>
+      <div class="info-card-body">
+        <div class="info-card-text">
+          <p>W&auml;hlt Vorschl&auml;ge aus, die eurem Kind besonders helfen.</p>
+          <p>Achtet auf eure Ampelbewertung, den Ort und die Kinderrechte.</p>
+          <p>Ihr k&ouml;nnt h&ouml;chstens 10 M&uuml;nzen &#129529; ausgeben.</p>
+        </div>
+        <div class="info-card-cta">Entscheidet gemeinsam: Welche Ma&szlig;nahmen sind f&uuml;r euer Kind am wichtigsten?</div>
+      </div>
+    </div>
+    <div id="interventionItems"></div>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
@@ -429,7 +461,7 @@ function updateCredits() {
 
 function renderInterventionList() {
   const used = getUsedCredits();
-  document.getElementById('locationsList').innerHTML = INTERVENTIONS.map(it => {
+  document.getElementById('interventionItems').innerHTML = INTERVENTIONS.map(it => {
     const sel  = localInterventions.has(it.id);
     const over = !sel && (used + it.credits > MAX_CREDITS);
     const cls  = sel ? 'selected' : over ? 'disabled' : '';
@@ -503,6 +535,10 @@ async function loadDashboardData(groupIds) {
       '<div class="rank-votes">' + r.count + '</div>' +
     '</div>'
   ).join('');
+}
+
+function toggleInfo() {
+  document.getElementById('infoCard').classList.toggle('open');
 }
 
 function sizeDashMap() {
