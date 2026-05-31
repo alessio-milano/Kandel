@@ -373,7 +373,7 @@ async function createSession() {
     document.getElementById('adminGroupList').innerHTML = grps.map((g,i) =>
       '<div class="group-list-item"><div class="group-num">' + (i+1) + '</div><div class="group-list-name">' + g.name + '</div></div>'
     ).join('');
-    const dashUrl = location.origin + location.pathname + '#dashboard/' + sess.id;
+    const dashUrl = location.href.split('#')[0] + '#dashboard/' + sess.id;
     document.getElementById('dashLinkInput').value = dashUrl;
     document.getElementById('dashLinkCard').style.display = 'block';
     showView('admin-join');
