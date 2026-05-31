@@ -105,11 +105,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .dash-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #52C41A; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 .dash-body { flex: 1; display: -webkit-flex; display: flex; overflow: hidden; min-height: 0; }
-/* Map col: sizes itself to the image's natural aspect ratio.
-   flex:0 0 auto + height:100% on img → column shrinks to image width.
-   Works on iOS 10+ without aspect-ratio. */
-.dash-map-col { -webkit-flex: 0 0 auto; flex: 0 0 auto; overflow: hidden; background: #111; }
-.dash-map-col img { height: 100%; width: auto; max-width: 100vw; display: block; }
+.dash-map-col { -webkit-flex-shrink: 0; flex-shrink: 0; overflow: hidden; background: #111; }
+.dash-map-col img { width: 100%; height: 100%; object-fit: fill; display: block; }
 .dash-rank-col { -webkit-flex: 1; flex: 1; min-width: 200px; background: var(--card); display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; overflow: hidden; border-left: 1px solid #e8e8e8; }
 
 /* Portrait / narrow screens (iPad portrait, small tablets) */
@@ -481,6 +478,7 @@ async function openDashboard(sessionId) {
   document.getElementById('dashTitle').textContent = sess ? sess.name : 'Dashboard';
   document.getElementById('dashBadge').textContent = (grps||[]).length + ' Gruppen';
   showView('dashboard');
+  sizeDashMap();
   await loadDashboardData(groupIds);
   if (dashSub) sb.removeChannel(dashSub);
   dashSub = sb.channel('dash-' + sessionId)
@@ -511,6 +509,17 @@ async function loadDashboardData(groupIds) {
     '</div>'
   ).join('');
 }
+
+function sizeDashMap() {
+  var body = document.querySelector('.dash-body');
+  var col  = document.querySelector('.dash-map-col');
+  var img  = col ? col.querySelector('img') : null;
+  if (!body || !col || !img) return;
+  var h = body.clientHeight;
+  var w = Math.round(h * img.naturalWidth / img.naturalHeight);
+  col.style.width = w + 'px';
+}
+window.addEventListener('resize', sizeDashMap);
 
 function copyDashLink() {
   const input = document.getElementById('dashLinkInput');
